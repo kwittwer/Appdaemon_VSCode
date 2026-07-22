@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:17.2.4
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
@@ -11,21 +11,13 @@ ARG CODE_SERVER_VERSION="4.93.1"
 # Copy Python requirements file
 COPY requirements.txt /tmp/
 
-# Setup base system, Python, AppDaemon, debugpy and code-server
-# hadolint ignore=DL3003,DL3042
+# Setup runtime dependencies, Python packages and code-server
+# hadolint ignore=DL3003
 RUN \
-    apk add --no-cache --virtual .build-dependencies \
-        build-base \
-        python3-dev \
-    \
-    && apk add --no-cache \
+    apk add --no-cache \
         python3 \
         py3-pip \
         py3-wheel \
-        nodejs \
-        npm \
-        git \
-        openssh-client \
         libstdc++ \
     \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
@@ -45,8 +37,7 @@ RUN \
     && find /usr \
         \( -type d -a -name test -o -name tests -o -name '__pycache__' \) \
         -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
-        -exec rm -rf '{}' + \
-    && apk del --no-cache --purge .build-dependencies
+        -exec rm -rf '{}' +
 
 # Copy root filesystem
 COPY rootfs /
@@ -65,7 +56,7 @@ LABEL \
     io.hass.name="${BUILD_NAME}" \
     io.hass.description="${BUILD_DESCRIPTION}" \
     io.hass.arch="${BUILD_ARCH}" \
-    io.hass.type="addon" \
+    io.hass.type="app" \
     io.hass.version=${BUILD_VERSION} \
     org.opencontainers.image.title="${BUILD_NAME}" \
     org.opencontainers.image.description="${BUILD_DESCRIPTION}" \

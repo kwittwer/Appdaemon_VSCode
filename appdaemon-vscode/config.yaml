@@ -24,7 +24,7 @@ ports_description:
   5050/tcp: AppDaemon Web UI / Dashboard
   5678/tcp: debugpy Remote Debugging (VS Code attach)
 map:
-  - addon_config:rw
+  - app_config:rw
   - homeassistant_config:rw
   - share:rw
   - ssl
