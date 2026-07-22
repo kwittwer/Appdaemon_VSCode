@@ -37,6 +37,9 @@ if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/launch.json"; then
     bashio::log.info "Seeding VS Code launch.json..."
     mkdir -p "${CONFIG_DIR}/.vscode"
     cp "${DEFAULTS_DIR}/vscode/launch.json" "${CONFIG_DIR}/.vscode/launch.json"
+    cp "${DEFAULTS_DIR}/vscode/tasks.json" "${CONFIG_DIR}/.vscode/tasks.json"
+    cp "${DEFAULTS_DIR}/vscode/restart-addon.sh" "${CONFIG_DIR}/.vscode/restart-addon.sh"
+    chmod +x "${CONFIG_DIR}/.vscode/restart-addon.sh"
 fi
 
 # Migrate old debug adapter type in all workspace launch.json files.

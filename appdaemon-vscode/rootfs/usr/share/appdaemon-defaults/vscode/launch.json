@@ -16,6 +16,23 @@
                 }
             ],
             "justMyCode": false
+        },
+        {
+            "name": "AppDaemon Remote Debug (restart + attach)",
+            "type": "python",
+            "request": "attach",
+            "connect": {
+                "host": "127.0.0.1",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "/config",
+                    "remoteRoot": "/config"
+                }
+            ],
+            "justMyCode": false,
+            "preLaunchTask": "Restart AppDaemon Add-on"
         }
     ]
 }
