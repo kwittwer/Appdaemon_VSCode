@@ -1,0 +1,76 @@
+#!/command/with-contenv bashio
+# ==============================================================================
+# AppDaemon + VS Code add-on
+# Prepares the AppDaemon configuration directory on first start
+# ==============================================================================
+declare log_level
+declare -a python_packages
+declare -a system_packages
+declare -a init_commands
+
+readonly CONFIG_DIR="/config"
+readonly APPS_DIR="${CONFIG_DIR}/apps"
+readonly DEFAULTS_DIR="/usr/share/appdaemon-defaults"
+
+# ------------------------------------------------------------------------------
+# Ensure the AppDaemon configuration structure exists
+# ------------------------------------------------------------------------------
+mkdir -p "${APPS_DIR}"
+mkdir -p "${CONFIG_DIR}/dashboards"
+
+# Seed the main configuration on first run
+if ! bashio::fs.file_exists "${CONFIG_DIR}/appdaemon.yaml"; then
+    bashio::log.info "No appdaemon.yaml found, creating a default one..."
+    cp "${DEFAULTS_DIR}/appdaemon.yaml" "${CONFIG_DIR}/appdaemon.yaml"
+fi
+
+# Seed apps.yaml and example apps on first run
+if ! bashio::fs.file_exists "${APPS_DIR}/apps.yaml"; then
+    bashio::log.info "Seeding example AppDaemon apps..."
+    cp "${DEFAULTS_DIR}/apps/apps.yaml" "${APPS_DIR}/apps.yaml"
+    cp "${DEFAULTS_DIR}/apps/example_app.py" "${APPS_DIR}/example_app.py"
+    cp "${DEFAULTS_DIR}/apps/debug_helper.py" "${APPS_DIR}/debug_helper.py"
+fi
+
+# Seed a VS Code debug configuration on first run
+if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/launch.json"; then
+    bashio::log.info "Seeding VS Code launch.json..."
+    mkdir -p "${CONFIG_DIR}/.vscode"
+    cp "${DEFAULTS_DIR}/vscode/launch.json" "${CONFIG_DIR}/.vscode/launch.json"
+fi
+
+# ------------------------------------------------------------------------------
+# Optional: install extra system packages
+# ------------------------------------------------------------------------------
+if bashio::config.has_value 'system_packages'; then
+    for package in $(bashio::config 'system_packages'); do
+        system_packages+=("${package}")
+    done
+    bashio::log.info "Installing extra system packages: ${system_packages[*]}"
+    apk add --no-cache "${system_packages[@]}" \
+        || bashio::log.warning "Failed installing one or more system packages"
+fi
+
+# ------------------------------------------------------------------------------
+# Optional: install extra Python packages
+# ------------------------------------------------------------------------------
+if bashio::config.has_value 'python_packages'; then
+    for package in $(bashio::config 'python_packages'); do
+        python_packages+=("${package}")
+    done
+    bashio::log.info "Installing extra Python packages: ${python_packages[*]}"
+    pip install --no-cache-dir --break-system-packages "${python_packages[@]}" \
+        || bashio::log.warning "Failed installing one or more Python packages"
+fi
+
+# ------------------------------------------------------------------------------
+# Optional: run custom init commands
+# ------------------------------------------------------------------------------
+if bashio::config.has_value 'init_commands'; then
+    while read -r cmd; do
+        bashio::log.info "Running init command: ${cmd}"
+        eval "${cmd}" || bashio::log.warning "Init command failed: ${cmd}"
+    done <<< "$(bashio::config 'init_commands')"
+fi
+
+bashio::log.info "AppDaemon configuration is ready."

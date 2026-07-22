@@ -1,0 +1,2 @@
+appdaemon==4.5.11
+debugpy==1.8.7

@@ -1,0 +1,11 @@
+---
+# AppDaemon apps registration
+# Docs: https://appdaemon.readthedocs.io/en/latest/APPGUIDE.html
+
+debug_helper:
+  module: debug_helper
+  class: DebugHelper
+
+example_app:
+  module: example_app
+  class: ExampleApp

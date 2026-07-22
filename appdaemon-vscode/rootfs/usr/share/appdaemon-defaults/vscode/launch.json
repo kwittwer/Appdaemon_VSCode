@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AppDaemon Remote Debug (attach)",
+            "type": "debugpy",
+            "request": "attach",
+            "connect": {
+                "host": "127.0.0.1",
+                "port": 5678
+            },
+            "pathMappings": [
+                {
+                    "localRoot": "/config",
+                    "remoteRoot": "/config"
+                }
+            ],
+            "justMyCode": false
+        }
+    ]
+}

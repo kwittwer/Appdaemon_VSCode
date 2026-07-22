@@ -1,0 +1,19 @@
+#!/command/with-contenv bashio
+# ==============================================================================
+# Start AppDaemon
+# ==============================================================================
+declare log_level
+
+# Map add-on log level to AppDaemon log level
+log_level="$(bashio::config 'log_level' 'info')"
+
+# Provide the Supervisor token and internal API URL to AppDaemon via env,
+# so appdaemon.yaml can reference them (see default appdaemon.yaml).
+export SUPERVISOR_TOKEN="${SUPERVISOR_TOKEN}"
+export HASS_URL="http://supervisor/core"
+
+bashio::log.info "Starting AppDaemon..."
+
+cd /config || bashio::exit.nok "Could not change to /config directory"
+
+exec appdaemon -c /config

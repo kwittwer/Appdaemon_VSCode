@@ -1,0 +1,11 @@
+{
+    "telemetry.telemetryLevel": "off",
+    "python.defaultInterpreterPath": "/usr/bin/python3",
+    "python.terminal.activateEnvironment": false,
+    "files.exclude": {
+        "**/.vscode-extensions": true,
+        "**/.vscode-data": true,
+        "**/__pycache__": true
+    },
+    "workbench.colorTheme": "Default Dark Modern"
+}

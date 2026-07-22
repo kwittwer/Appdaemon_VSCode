@@ -1,0 +1,40 @@
+#!/command/with-contenv bashio
+# ==============================================================================
+# Start code-server (VS Code in the browser), served through Home Assistant
+# Ingress on 127.0.0.1:8000 with authentication disabled (Ingress handles auth).
+# ==============================================================================
+readonly EXT_DIR="/config/.vscode-extensions"
+readonly DATA_DIR="/config/.vscode-data"
+readonly USER_SETTINGS_DIR="${DATA_DIR}/User"
+
+mkdir -p "${EXT_DIR}" "${USER_SETTINGS_DIR}"
+
+# Provide sensible default user settings on first run
+if ! bashio::fs.file_exists "${USER_SETTINGS_DIR}/settings.json"; then
+    cp /usr/share/code-server/settings.json "${USER_SETTINGS_DIR}/settings.json"
+fi
+
+# Install Python + debugpy extensions once (best effort, needs internet)
+install_ext() {
+    local id="$1"
+    if ! code-server --extensions-dir "${EXT_DIR}" --list-extensions 2>/dev/null \
+        | grep -qix "${id}"; then
+        bashio::log.info "Installing VS Code extension: ${id}"
+        code-server --extensions-dir "${EXT_DIR}" --install-extension "${id}" \
+            || bashio::log.warning "Could not install extension ${id} (offline?)"
+    fi
+}
+
+install_ext "ms-python.python"
+install_ext "ms-python.debugpy"
+
+bashio::log.info "Starting code-server (VS Code) on Ingress..."
+
+exec code-server \
+    --auth none \
+    --disable-telemetry \
+    --disable-update-check \
+    --bind-addr 127.0.0.1:8000 \
+    --extensions-dir "${EXT_DIR}" \
+    --user-data-dir "${DATA_DIR}" \
+    /config
