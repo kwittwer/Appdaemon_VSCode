@@ -42,6 +42,12 @@ RUN \
 # Copy root filesystem
 COPY rootfs /
 
+# Ensure s6 service scripts are executable (Windows git checkouts may lose +x)
+RUN \
+    chmod +x /etc/s6-overlay/s6-rc.d/init-appdaemon/run \
+    && chmod +x /etc/s6-overlay/s6-rc.d/appdaemon/run \
+    && chmod +x /etc/s6-overlay/s6-rc.d/code-server/run
+
 # Build arguments
 ARG BUILD_ARCH
 ARG BUILD_DATE
