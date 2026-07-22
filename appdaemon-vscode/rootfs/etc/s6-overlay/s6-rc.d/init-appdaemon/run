@@ -39,6 +39,13 @@ if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/launch.json"; then
     cp "${DEFAULTS_DIR}/vscode/launch.json" "${CONFIG_DIR}/.vscode/launch.json"
 fi
 
+# Migrate old debug adapter type to the currently supported Python adapter.
+if bashio::fs.file_exists "${CONFIG_DIR}/.vscode/launch.json" \
+    && grep -q '"type"[[:space:]]*:[[:space:]]*"debugpy"' "${CONFIG_DIR}/.vscode/launch.json"; then
+    bashio::log.info "Updating VS Code launch.json debug type from debugpy to python..."
+    sed -i 's/"type"[[:space:]]*:[[:space:]]*"debugpy"/"type": "python"/g' "${CONFIG_DIR}/.vscode/launch.json"
+fi
+
 # ------------------------------------------------------------------------------
 # Optional: install extra system packages
 # ------------------------------------------------------------------------------

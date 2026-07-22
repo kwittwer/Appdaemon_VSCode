@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "AppDaemon Remote Debug (attach)",
-            "type": "debugpy",
+            "type": "python",
             "request": "attach",
             "connect": {
                 "host": "127.0.0.1",
