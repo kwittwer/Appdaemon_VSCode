@@ -24,7 +24,7 @@ exec code-server \
     --auth none \
     --disable-telemetry \
     --disable-update-check \
-    --bind-addr 127.0.0.1:8000 \
+    --bind-addr 0.0.0.0:8000 \
     --extensions-dir "${EXT_DIR}" \
     --user-data-dir "${DATA_DIR}" \
     /config
