@@ -18,7 +18,7 @@ RUN \
         python3 \
         py3-pip \
         py3-wheel \
-        nodejs \
+        gcompat \
         libstdc++ \
     \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
@@ -33,8 +33,6 @@ RUN \
     && curl -fsSL \
         "https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-${CS_ARCH}.tar.gz" \
         | tar -xz -C /opt/code-server --strip-components=1 \
-    && rm -f /opt/code-server/lib/node \
-    && ln -s /usr/bin/node /opt/code-server/lib/node \
     && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
     \
     && find /usr \
