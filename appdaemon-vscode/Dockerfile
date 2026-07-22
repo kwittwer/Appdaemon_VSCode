@@ -24,7 +24,7 @@ RUN \
     \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
     \
-    && npm install --global "code-server@${CODE_SERVER_VERSION}" \
+    && FORCE_NODE_VERSION=1 npm install --global "code-server@${CODE_SERVER_VERSION}" \
     && npm cache clean --force \
     \
     && find /usr \
