@@ -1,6 +1,6 @@
 ---
 name: AppDaemon + VS Code
-version: "1.0.3"
+version: "1.0.4"
 slug: appdaemon-vscode
 description: >-
   AppDaemon 4.x mit integriertem VS Code (code-server) und debugpy
@@ -15,6 +15,7 @@ hassio_api: true
 webui: http://[HOST]:[PORT:5050]
 ingress: true
 ingress_port: 8000
+ingress_entry: true
 panel_icon: mdi:microsoft-visual-studio-code
 panel_title: AppDaemon Code
 ports:
