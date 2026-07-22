@@ -5,7 +5,7 @@ slug: appdaemon-vscode
 description: >-
   AppDaemon 4.x mit integriertem VS Code (code-server) und debugpy
   fuer Remote-Debugging von AppDaemon-Apps.
-url: https://github.com/YOUR_GITHUB_USER/hassio-addon-appdaemon-vscode/tree/main/appdaemon-vscode
+url: https://github.com/kwittwer/Appdaemon_VSCode/tree/main/addon-repo/appdaemon-vscode
 arch:
   - aarch64
   - amd64

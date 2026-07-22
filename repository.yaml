@@ -1,4 +1,4 @@
 ---
 name: AppDaemon + VS Code Add-on Repository
-url: https://github.com/YOUR_GITHUB_USER/hassio-addon-appdaemon-vscode
-maintainer: KFW WSLHA <you@example.com>
+url: https://github.com/kwittwer/Appdaemon_VSCode
+maintainer: kwittwer <kwittwer@example.com>

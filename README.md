@@ -15,7 +15,7 @@ in einem einzigen Add-on vereint.
 3. Die URL dieses Repositories eintragen, z. B.:
 
    ```
-   https://github.com/YOUR_GITHUB_USER/hassio-addon-appdaemon-vscode
+   https://github.com/kwittwer/Appdaemon_VSCode
    ```
 
 4. Das Repository hinzufügen und die Seite neu laden.

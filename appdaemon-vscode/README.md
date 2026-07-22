@@ -10,4 +10,9 @@ Remote-Debugging – alles in einem Add-on.
 Die Verbindung zu Home Assistant erfolgt automatisch ueber den Supervisor –
 ein Long-Lived Access Token ist nicht erforderlich.
 
+## Store-Assets
+
+Icon und Logo liegen direkt im Add-on-Ordner, damit Home Assistant sie im
+Add-on-Store und in der UI anzeigen kann.
+
 Ausfuehrliche Anleitung: siehe [DOCS.md](DOCS.md).
