@@ -14,22 +14,9 @@ if ! bashio::fs.file_exists "${USER_SETTINGS_DIR}/settings.json"; then
     cp /usr/share/code-server/settings.json "${USER_SETTINGS_DIR}/settings.json"
 fi
 
-# Install Python extension once (best effort, needs internet)
-install_ext() {
-    local id="$1"
-    if ! code-server --extensions-dir "${EXT_DIR}" --list-extensions 2>/dev/null \
-        | grep -qix "${id}"; then
-        bashio::log.info "Installing VS Code extension: ${id}"
-        code-server --extensions-dir "${EXT_DIR}" --install-extension "${id}" \
-            || bashio::log.warning "Could not install extension ${id} (offline?)"
-    fi
-}
-
-install_ext "ms-python.python"
-
-# debugpy VS Code extension is not available on all Alpine ARM targets.
-# Runtime debugging still works because Python debugpy package is preinstalled.
-bashio::log.info "Skipping ms-python.debugpy extension auto-install on this image"
+# Keep startup path minimal for ingress readiness.
+# Python debugging works via preinstalled debugpy package.
+bashio::log.info "Skipping VS Code extension auto-install during startup"
 
 bashio::log.info "Starting code-server (VS Code) on Ingress..."
 
