@@ -18,21 +18,14 @@ RUN \
         python3 \
         py3-pip \
         py3-wheel \
+        nodejs \
+        npm \
         libstdc++ \
     \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
     \
-    && ARCH="$(apk --print-arch)" \
-    && case "${ARCH}" in \
-        x86_64)  CS_ARCH="amd64" ;; \
-        aarch64) CS_ARCH="arm64" ;; \
-        *) echo "Unsupported architecture: ${ARCH}" && exit 1 ;; \
-    esac \
-    && mkdir -p /opt/code-server \
-    && curl -fsSL \
-        "https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-${CS_ARCH}.tar.gz" \
-        | tar -xz -C /opt/code-server --strip-components=1 \
-    && ln -s /opt/code-server/bin/code-server /usr/bin/code-server \
+    && npm install --global "code-server@${CODE_SERVER_VERSION}" \
+    && npm cache clean --force \
     \
     && find /usr \
         \( -type d -a -name test -o -name tests -o -name '__pycache__' \) \
