@@ -1,6 +1,6 @@
 ---
 name: AppDaemon + VS Code
-version: "1.0.8"
+version: "1.0.9"
 slug: appdaemon-vscode
 description: >-
   AppDaemon 4.x mit integriertem VS Code (code-server) und debugpy

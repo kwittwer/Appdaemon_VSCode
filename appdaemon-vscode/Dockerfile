@@ -18,14 +18,10 @@ RUN \
         python3 \
         py3-pip \
         py3-wheel \
-        nodejs \
-        npm \
+        code-server \
         libstdc++ \
     \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
-    \
-    && FORCE_NODE_VERSION=22 npm install --unsafe-perm --global "code-server@${CODE_SERVER_VERSION}" \
-    && npm cache clean --force \
     \
     && find /usr \
         \( -type d -a -name test -o -name tests -o -name '__pycache__' \) \
