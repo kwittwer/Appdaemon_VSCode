@@ -21,7 +21,6 @@ RUN \
         nodejs \
         npm \
         libstdc++ \
-        gcompat \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 # Download and install code-server
@@ -36,6 +35,8 @@ RUN \
     && curl -fsSL \
         "https://github.com/coder/code-server/releases/download/v4.93.1/code-server-4.93.1-linux-${CS_ARCH}.tar.gz" \
         | tar -xz -C /opt/code-server --strip-components=1 \
+    && rm -f /opt/code-server/lib/node \
+    && ln -s /usr/bin/node /opt/code-server/lib/node \
     && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server
 
 # Cleanup
