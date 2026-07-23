@@ -24,9 +24,6 @@ RUN \
         python3-dev \
         build-base \
         libstdc++ \
-        gcc \
-        musl-dev \
-        linux-headers \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 # Download and install code-server
