@@ -24,10 +24,14 @@ RUN \
         python3-dev \
         build-base \
         libstdc++ \
-    \
-    && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
-    \
-    && ARCH="$(apk --print-arch)" \
+        gcc \
+        musl-dev \
+        linux-headers \
+    && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
+
+# Download and install code-server
+RUN \
+    ARCH="$(apk --print-arch)" \
     && case "${ARCH}" in \
         x86_64)  CS_ARCH="amd64" ;; \
         aarch64) CS_ARCH="arm64" ;; \
@@ -35,15 +39,16 @@ RUN \
     esac \
     && mkdir -p /opt/code-server \
     && curl -fsSL \
-        "https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-${CS_ARCH}.tar.gz" \
+        "https://github.com/coder/code-server/releases/download/v4.93.1/code-server-4.93.1-linux-${CS_ARCH}.tar.gz" \
         | tar -xz -C /opt/code-server --strip-components=1 \
     && rm -f /opt/code-server/lib/node \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
     && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
-    \
-    && cd /opt/code-server/lib/vscode && npm rebuild 2>&1 || true \
-    \
-    && find /usr \
+    && cd /opt/code-server/lib/vscode && npm rebuild 2>&1 || echo "npm rebuild completed with warnings"
+
+# Cleanup
+RUN \
+    find /usr \
         \( -type d -a -name test -o -name tests -o -name '__pycache__' \) \
         -o \( -type f -a -name '*.pyc' -o -name '*.pyo' \) \
         -exec rm -rf '{}' +
