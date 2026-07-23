@@ -161,13 +161,14 @@ Ingress, keine separate Anmeldung noetig). Er oeffnet direkt den Ordner
 
 ### AppDaemon-Logs in VS Code anzeigen
 
-Die AppDaemon-Logs werden nach `/logs/appdaemon.log` geschrieben.
-Im VS Code Integrated Terminal kannst du sie live sehen:
+Die AppDaemon-Logs werden nach `/config/logs/appdaemon.log` geschrieben und
+laufen nach dem Start automatisch live im unteren Terminal-Panel (Task
+**Watch AppDaemon Logs**). Du kannst sie auch manuell anzeigen:
 
 #### Methode 1: Einfacher Befehl
 
 ```bash
-tail -f /logs/appdaemon.log
+tail -f /config/logs/appdaemon.log
 ```
 
 #### Methode 2: Helper-Skript
@@ -191,6 +192,29 @@ Beende die Anzeige mit `Ctrl+C`.
 Fuer den Attach von einem **externen** VS Code (nicht code-server) muss der
 Port `5678` freigegeben sein (Tab **Network**) und im `launch.json` als Host die
 IP des Home-Assistant-Hosts eingetragen werden.
+
+### Beispiel `launch.json`
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AppDaemon Remote Debug (attach)",
+      "type": "python",
+      "request": "attach",
+      "connect": { "host": "localhost", "port": 5678 },
+      "pathMappings": [
+        { "localRoot": "${workspaceFolder}/apps", "remoteRoot": "/config/apps" }
+      ],
+      "justMyCode": false
+    }
+  ]
+}
+```
+
+Bei einem externen VS Code `host` auf die IP des HA-Hosts setzen
+(z. B. `192.168.178.150`).
 
 ## Ports
 
