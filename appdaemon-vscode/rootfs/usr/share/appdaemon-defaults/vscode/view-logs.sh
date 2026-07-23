@@ -3,24 +3,10 @@
 # Usage: bash .vscode/view-logs.sh
 # Or from code-server terminal: tail -f /logs/appdaemon.log
 
-LOG_CANDIDATES=(
-    "/logs/appdaemon.log"
-    "/config/logs/appdaemon.log"
-)
+LOG_FILE="/logs/appdaemon.log"
 
-LOG_FILE=""
-for candidate in "${LOG_CANDIDATES[@]}"; do
-    if [ -f "${candidate}" ]; then
-        LOG_FILE="${candidate}"
-        break
-    fi
-done
-
-if [ -z "${LOG_FILE}" ]; then
-    LOG_FILE="/logs/appdaemon.log"
-    echo "📋 Log file not found yet. Checked:"
-    echo "   - /logs/appdaemon.log"
-    echo "   - /config/logs/appdaemon.log"
+if [ ! -f "${LOG_FILE}" ]; then
+    echo "📋 Log file not found yet: ${LOG_FILE}"
     echo "   AppDaemon will create it when it starts."
     exit 1
 fi

@@ -10,8 +10,6 @@ appdaemon:
   longitude: 0.0
   elevation: 0
   time_zone: Europe/Berlin
-  log_dir: /logs
-  log_file: appdaemon.log
   plugins:
     HASS:
       type: hass
@@ -24,3 +22,47 @@ http:
 admin:
 api:
 hadashboard:
+
+# Logging configuration for AppDaemon 4.x
+# This enables file logging to /logs/appdaemon.log
+logging:
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    simple:
+      format: "%(asctime)s.%(msecs)03d %(levelname) -8s %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+  handlers:
+    file:
+      class: logging.FileHandler
+      level: INFO
+      formatter: simple
+      filename: /logs/appdaemon.log
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+  loggers:
+    appdaemon.general:
+      handlers:
+        - file
+        - console
+      level: INFO
+      propagate: false
+    appdaemon.error:
+      handlers:
+        - file
+        - console
+      level: INFO
+      propagate: false
+    appdaemon.access:
+      handlers:
+        - file
+      level: INFO
+      propagate: false
+    appdaemon.diag:
+      handlers:
+        - file
+      level: INFO
+      propagate: false

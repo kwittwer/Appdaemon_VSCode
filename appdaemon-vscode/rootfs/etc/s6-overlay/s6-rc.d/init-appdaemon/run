@@ -61,38 +61,10 @@ if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/view-logs.sh"; then
     chmod +x "${CONFIG_DIR}/.vscode/view-logs.sh"
 fi
 
-# Ensure AppDaemon writes logs to the active log directory.
-if grep -q '^[[:space:]]*log_dir:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml"; then
-    sed -i "s#^[[:space:]]*log_dir:[[:space:]]*.*#  log_dir: ${LOG_DIR}#" "${CONFIG_DIR}/appdaemon.yaml"
-else
-    bashio::log.info "Adding AppDaemon log_dir setting to appdaemon.yaml..."
-    tmp_file="$(mktemp)"
-    awk -v logdir="${LOG_DIR}" '
-        /^[[:space:]]*appdaemon:[[:space:]]*$/ && added == 0 {
-            print
-            print "  log_dir: " logdir
-            added = 1
-            next
-        }
-        { print }
-    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
-fi
-
-if grep -q '^[[:space:]]*log_file:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml"; then
-    sed -i 's#^[[:space:]]*log_file:[[:space:]]*.*#  log_file: appdaemon.log#' "${CONFIG_DIR}/appdaemon.yaml"
-else
-    bashio::log.info "Adding AppDaemon log_file setting to appdaemon.yaml..."
-    tmp_file="$(mktemp)"
-    awk '
-        /^[[:space:]]*log_dir:[[:space:]]*/ && added == 0 {
-            print
-            print "  log_file: appdaemon.log"
-            added = 1
-            next
-        }
-        { print }
-    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
-fi
+# Ensure the log directory exists with correct permissions
+# AppDaemon 4.x uses logging config for file output
+bashio::log.info "Ensuring log directory exists at ${LOG_DIR}..."
+mkdir -p "${LOG_DIR}" && chmod 755 "${LOG_DIR}" || bashio::log.error "Failed to create ${LOG_DIR}"
 
 # Ensure MQTT plugin defaults are only configured when explicitly enabled.
 mqtt_broker="$(bashio::config 'mqtt_broker')"

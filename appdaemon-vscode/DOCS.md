@@ -125,9 +125,7 @@ Ingress, keine separate Anmeldung noetig). Er oeffnet direkt den Ordner
 
 ### AppDaemon-Logs in VS Code anzeigen
 
-Die AppDaemon-Logs werden bevorzugt nach `/logs/appdaemon.log` geschrieben.
-Falls diese Struktur nicht verfuegbar ist, nutzt das Add-on automatisch
-`/config/logs/appdaemon.log`.
+Die AppDaemon-Logs werden nach `/logs/appdaemon.log` geschrieben.
 Im VS Code Integrated Terminal kannst du sie live sehen:
 
 #### Methode 1: Einfacher Befehl
