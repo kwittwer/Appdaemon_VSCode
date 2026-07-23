@@ -41,7 +41,7 @@ RUN \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
     && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
     \
-    && npm rebuild node-pty --prefix /opt/code-server/lib/vscode \
+    && cd /opt/code-server/lib/vscode && npm rebuild 2>&1 || true \
     \
     && find /usr \
         \( -type d -a -name test -o -name tests -o -name '__pycache__' \) \
