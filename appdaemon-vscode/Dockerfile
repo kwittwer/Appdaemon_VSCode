@@ -21,6 +21,7 @@ RUN \
         nodejs \
         npm \
         libstdc++ \
+        gcompat \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
 # Download and install code-server
@@ -37,13 +38,7 @@ RUN \
         | tar -xz -C /opt/code-server --strip-components=1 \
     && rm -f /opt/code-server/lib/node \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
-    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
-    \
-    && apk upgrade --no-cache --available \
-    && apk add --no-cache --virtual .build-deps build-base python3-dev \
-    && ( cd /opt/code-server/lib/vscode \
-         && npm rebuild node-pty --build-from-source 2>&1 || echo "node-pty rebuild warnings" ) \
-    && apk del .build-deps
+    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server
 
 # Cleanup
 RUN \
