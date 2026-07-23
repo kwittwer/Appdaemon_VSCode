@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base:17.2.4
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:21.0.0
 # hadolint ignore=DL3006
 FROM ${BUILD_FROM}
 
@@ -37,7 +37,12 @@ RUN \
         | tar -xz -C /opt/code-server --strip-components=1 \
     && rm -f /opt/code-server/lib/node \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
-    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server
+    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
+    \
+    && apk add --no-cache --virtual .build-deps build-base python3-dev \
+    && ( cd /opt/code-server/lib/vscode \
+         && npm rebuild node-pty --build-from-source 2>&1 || echo "node-pty rebuild warnings" ) \
+    && apk del .build-deps
 
 # Cleanup
 RUN \
