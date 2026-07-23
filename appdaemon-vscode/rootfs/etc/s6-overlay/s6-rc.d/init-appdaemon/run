@@ -90,29 +90,24 @@ fi
 # Migrate: add logs: block if not present (AppDaemon 4.x file logging)
 if ! grep -q '^logs:' "${CONFIG_DIR}/appdaemon.yaml"; then
     bashio::log.info "Adding logs: block to appdaemon.yaml for file output at ${LOG_DIR}..."
-    tmp_file="$(mktemp)"
-    awk -v logdir="${LOG_DIR}" '
-        /^http:/ && added == 0 {
-            print "logs:"
-            print "  main_log:"
-            print "    filename: " logdir "/appdaemon.log"
-            print "  error_log:"
-            print "    filename: " logdir "/appdaemon.log"
-            print "  access_log:"
-            print "    filename: " logdir "/access.log"
-            print "  diag_log:"
-            print "    filename: " logdir "/diag.log"
-            print ""
-            added = 1
-        }
-        { print }
-    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
+    # Insert logs: block before the http: section
+    sed -i "/^http:/i\\
+logs:\\
+  main_log:\\
+    filename: ${LOG_DIR}/appdaemon.log\\
+  error_log:\\
+    filename: ${LOG_DIR}/appdaemon.log\\
+  access_log:\\
+    filename: ${LOG_DIR}/access.log\\
+  diag_log:\\
+    filename: ${LOG_DIR}/diag.log\\
+" "${CONFIG_DIR}/appdaemon.yaml"
 fi
 
 # Migrate: update log path in existing logs: block if pointing to wrong dir
 if grep -q '^logs:' "${CONFIG_DIR}/appdaemon.yaml"; then
     if ! grep -q "filename: ${LOG_DIR}/" "${CONFIG_DIR}/appdaemon.yaml"; then
-        bashio::log.info "Updating log path in logs: block to ${LOG_DIR}..."
+        bashio::log.info "Updating log paths in logs: block to ${LOG_DIR}..."
         sed -i "s#filename: .*/appdaemon\.log#filename: ${LOG_DIR}/appdaemon.log#g" "${CONFIG_DIR}/appdaemon.yaml"
         sed -i "s#filename: .*/access\.log#filename: ${LOG_DIR}/access.log#g" "${CONFIG_DIR}/appdaemon.yaml"
         sed -i "s#filename: .*/diag\.log#filename: ${LOG_DIR}/diag.log#g" "${CONFIG_DIR}/appdaemon.yaml"
