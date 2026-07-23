@@ -48,6 +48,11 @@ if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/restart-addon.sh"; then
     cp "${DEFAULTS_DIR}/vscode/restart-addon.sh" "${CONFIG_DIR}/.vscode/restart-addon.sh"
     chmod +x "${CONFIG_DIR}/.vscode/restart-addon.sh"
 fi
+if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/view-logs.sh"; then
+    bashio::log.info "Seeding VS Code log viewer script..."
+    cp "${DEFAULTS_DIR}/vscode/view-logs.sh" "${CONFIG_DIR}/.vscode/view-logs.sh"
+    chmod +x "${CONFIG_DIR}/.vscode/view-logs.sh"
+fi
 
 # Ensure AppDaemon writes logs to /config/logs/appdaemon.log.
 if ! grep -q '^[[:space:]]*log_dir:[[:space:]]*/config/logs' "${CONFIG_DIR}/appdaemon.yaml"; then
@@ -65,9 +70,28 @@ if ! grep -q '^[[:space:]]*log_dir:[[:space:]]*/config/logs' "${CONFIG_DIR}/appd
     ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
 fi
 
-# Ensure MQTT plugin defaults are available for the HA Mosquitto broker.
+# Ensure MQTT plugin defaults are only configured when explicitly enabled.
 mqtt_broker="$(bashio::config 'mqtt_broker')"
-if [ -n "${mqtt_broker}" ] && ! grep -q '^[[:space:]]*MQTT:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
+if [ -z "${mqtt_broker}" ] && grep -q '^[[:space:]]*MQTT:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
+    bashio::log.info "Removing MQTT plugin from appdaemon.yaml (mqtt_broker not configured)..."
+    tmp_file="$(mktemp)"
+    awk '
+        {
+            if (drop == 1) {
+                if ($0 ~ /^    [A-Za-z0-9_]+:[[:space:]]*$/ || $0 ~ /^[^ ]/) {
+                    drop = 0
+                } else {
+                    next
+                }
+            }
+            if (drop == 0 && $0 ~ /^    MQTT:[[:space:]]*$/) {
+                drop = 1
+                next
+            }
+            print
+        }
+    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
+elif [ -n "${mqtt_broker}" ] && ! grep -q '^[[:space:]]*MQTT:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
     if grep -q '^[[:space:]]*plugins:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
         mqtt_port="$(bashio::config 'mqtt_port')"
         mqtt_user="$(bashio::config 'mqtt_user')"

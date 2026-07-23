@@ -13,11 +13,6 @@ appdaemon:
   log_dir: /config/logs
   log_file: appdaemon.log
   plugins:
-    MQTT:
-      type: mqtt
-      namespace: mqtt
-      client_host: mosquitto
-      client_port: 1883
     HASS:
       type: hass
       ha_url: http://supervisor/core

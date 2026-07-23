@@ -11,23 +11,6 @@
             },
             "problemMatcher": [],
             "isBackground": false
-        },
-        {
-            "label": "Watch AppDaemon Logs",
-            "type": "shell",
-            "command": "tail",
-            "args": [
-                "-n",
-                "200",
-                "-f",
-                "/config/logs/appdaemon.log"
-            ],
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": [],
-            "isBackground": true
         }
     ]
 }

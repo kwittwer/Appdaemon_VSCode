@@ -23,7 +23,7 @@ Die Add-on-Optionen (Tab **Configuration**):
 
 ```yaml
 log_level: info
-mqtt_broker: mosquitto
+mqtt_broker: ""
 mqtt_port: 1883
 mqtt_user: ""
 mqtt_password: ""
@@ -48,12 +48,11 @@ system_packages:
 
 ### Optionen: `mqtt_broker`, `mqtt_port`, `mqtt_user`, `mqtt_password`
 
-Standardmaessig wird der MQTT-Plugin-Block fuer AppDaemon mit dem Broker
-`mosquitto` und Port `1883` eingerichtet. Damit kann AppDaemon direkt mit dem
-Home-Assistant-MQTT-Broker arbeiten.
+Standardmaessig ist MQTT deaktiviert (`mqtt_broker: ""`), damit AppDaemon
+auch ohne erreichbaren Broker stabil startet.
 
-Wenn dein Broker Authentifizierung verlangt, setze `mqtt_user` und
-`mqtt_password` in den Add-on-Optionen.
+Wenn du MQTT nutzen willst, setze den Broker explizit (z. B. `mosquitto`) und
+optional Benutzer/Passwort in den Add-on-Optionen.
 
 ```yaml
 mqtt_broker: mosquitto
@@ -106,16 +105,14 @@ Die Standard-`appdaemon.yaml` nutzt den internen Supervisor-Proxy:
 
 ```yaml
 plugins:
-  MQTT:
-    type: mqtt
-    namespace: mqtt
-    client_host: mosquitto
-    client_port: 1883
   HASS:
     type: hass
     ha_url: http://supervisor/core
     token: !env_var SUPERVISOR_TOKEN
 ```
+
+Wenn `mqtt_broker` gesetzt ist, ergaenzt das Init-Skript automatisch einen
+MQTT-Plugin-Block in der `appdaemon.yaml`.
 
 Es ist **kein** manueller Long-Lived Access Token noetig. Passe bei Bedarf
 `latitude`, `longitude`, `elevation` und `time_zone` in der `appdaemon.yaml` an.
@@ -129,12 +126,22 @@ Ingress, keine separate Anmeldung noetig). Er oeffnet direkt den Ordner
 ### AppDaemon-Logs in VS Code anzeigen
 
 Die AppDaemon-Logs werden nach `/config/logs/appdaemon.log` geschrieben.
-In VS Code kannst du sie live sehen:
+Im VS Code Integrated Terminal kannst du sie live sehen:
 
-1. `Ctrl+Shift+P` → `Tasks: Run Task`
-2. `Watch AppDaemon Logs` auswaehlen
+#### Methode 1: Einfacher Befehl
 
-Die Task zeigt die letzten 200 Zeilen und folgt neuen Eintraegen live.
+```bash
+tail -f /config/logs/appdaemon.log
+```
+
+#### Methode 2: Helper-Skript
+
+```bash
+bash .vscode/view-logs.sh
+```
+
+Beide Methoden zeigen die letzten 200 Zeilen und folgen neuen Eintraegen live.
+Beende die Anzeige mit `Ctrl+C`.
 
 ## Remote Debugging
 
