@@ -22,6 +22,30 @@ Dieses Add-on vereint drei Werkzeuge in einem Container:
 > "Web UI oeffnen"-Button. Dieser oeffnet VS Code. Die AppDaemon-UI oeffnest
 > du ueber die oben genannte URL `:5050`.
 
+### AppDaemon als Eintrag in der HA-Seitenleiste
+
+Fuer einen bequemen, dauerhaften **AppDaemon-Menuepunkt** direkt in der
+Home-Assistant-Seitenleiste (neben "AppDaemon Code") kannst du einen
+`panel_iframe` in deiner `configuration.yaml` ergaenzen:
+
+```yaml
+panel_iframe:
+  appdaemon:
+    title: "AppDaemon"
+    icon: mdi:robot
+    url: "http://homeassistant.local:5050"
+    require_admin: true
+```
+
+Ersetze `homeassistant.local` bei Bedarf durch die IP deines HA-Hosts
+(z. B. `http://192.168.178.150:5050`). Nach dem Eintragen Home Assistant
+neu starten (**Entwicklerwerkzeuge → YAML → Neustart**). Anschliessend
+erscheint "AppDaemon" als eigener Eintrag in der linken Seitenleiste.
+
+> Falls die AppDaemon-Oberflaeche im Iframe leer bleibt, blockiert der
+> Browser evtl. das Einbetten. Oeffne AppDaemon dann direkt ueber
+> `http://<HA-IP>:5050` in einem neuen Tab.
+
 ## Installation
 
 1. Repository in Home Assistant hinzufuegen

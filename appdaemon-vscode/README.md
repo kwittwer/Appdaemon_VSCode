@@ -24,6 +24,10 @@ Im VS Code Terminal laufen sie automatisch live im unteren Panel
 - **AppDaemon Dashboard / UI** – erreichbar unter `http://<HA-IP>:5050`
   (Port `5050`). Siehe [DOCS.md](DOCS.md) fuer Details.
 
+Fuer einen festen **AppDaemon-Eintrag in der HA-Seitenleiste** kannst du einen
+`panel_iframe` in der `configuration.yaml` anlegen – die genaue Anleitung steht
+in [DOCS.md](DOCS.md#appdaemon-als-eintrag-in-der-ha-seitenleiste).
+
 Die Verbindung zu Home Assistant erfolgt automatisch ueber den Supervisor –
 ein Long-Lived Access Token ist nicht erforderlich.
 
