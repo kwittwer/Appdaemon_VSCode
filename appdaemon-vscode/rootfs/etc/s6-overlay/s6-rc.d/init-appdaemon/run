@@ -66,6 +66,66 @@ fi
 bashio::log.info "Ensuring log directory exists at ${LOG_DIR}..."
 mkdir -p "${LOG_DIR}" && chmod 755 "${LOG_DIR}" || bashio::log.error "Failed to create ${LOG_DIR}"
 
+# Migrate: remove deprecated log_dir / log_file fields from appdaemon.yaml
+if grep -q '^[[:space:]]*log_dir:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml" || \
+   grep -q '^[[:space:]]*log_file:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml"; then
+    bashio::log.info "Removing deprecated log_dir/log_file fields from appdaemon.yaml..."
+    tmp_file="$(mktemp)"
+    grep -v '^[[:space:]]*log_dir:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml" | \
+        grep -v '^[[:space:]]*log_file:[[:space:]]*' > "${tmp_file}" && \
+        mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
+fi
+
+# Migrate: add logging: block if not present (AppDaemon 4.x file logging)
+if ! grep -q '^logging:' "${CONFIG_DIR}/appdaemon.yaml"; then
+    bashio::log.info "Adding logging: block to appdaemon.yaml for file output..."
+    cat >> "${CONFIG_DIR}/appdaemon.yaml" << LOGGING_BLOCK
+
+# Logging configuration for AppDaemon 4.x
+logging:
+  version: 1
+  disable_existing_loggers: false
+  formatters:
+    simple:
+      format: "%(asctime)s.%(msecs)03d %(levelname) -8s %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+  handlers:
+    file:
+      class: logging.FileHandler
+      level: INFO
+      formatter: simple
+      filename: ${LOG_DIR}/appdaemon.log
+    console:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: simple
+      stream: ext://sys.stdout
+  loggers:
+    appdaemon.general:
+      handlers:
+        - file
+        - console
+      level: INFO
+      propagate: false
+    appdaemon.error:
+      handlers:
+        - file
+        - console
+      level: INFO
+      propagate: false
+    appdaemon.access:
+      handlers:
+        - file
+      level: INFO
+      propagate: false
+    appdaemon.diag:
+      handlers:
+        - file
+      level: INFO
+      propagate: false
+LOGGING_BLOCK
+fi
+
 # Ensure MQTT plugin defaults are only configured when explicitly enabled.
 mqtt_broker="$(bashio::config 'mqtt_broker')"
 if [ -z "${mqtt_broker}" ] && grep -q '^[[:space:]]*MQTT:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
