@@ -7,6 +7,14 @@ Remote-Debugging – alles in einem Add-on.
 - **code-server** – VS Code direkt in der Home-Assistant-Sidebar (Ingress).
 - **debugpy** – Remote-Debugging deiner Apps aus VS Code (Port `5678`).
 
+Standardmaessig ist der MQTT-Plugin-Zugang fuer den HA-Broker `mosquitto`
+vorbereitet. Optional koennen `mqtt_user` und `mqtt_password` in den
+Add-on-Optionen gesetzt werden.
+
+AppDaemon schreibt seine Logs nach `/config/logs/appdaemon.log`.
+In VS Code kann der Live-Log ueber die Task **Watch AppDaemon Logs**
+angezeigt werden.
+
 Die Verbindung zu Home Assistant erfolgt automatisch ueber den Supervisor –
 ein Long-Lived Access Token ist nicht erforderlich.
 

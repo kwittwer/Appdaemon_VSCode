@@ -17,6 +17,7 @@ readonly DEFAULTS_DIR="/usr/share/appdaemon-defaults"
 # ------------------------------------------------------------------------------
 mkdir -p "${APPS_DIR}"
 mkdir -p "${CONFIG_DIR}/dashboards"
+mkdir -p "${CONFIG_DIR}/logs"
 
 # Seed the main configuration on first run
 if ! bashio::fs.file_exists "${CONFIG_DIR}/appdaemon.yaml"; then
@@ -33,13 +34,72 @@ if ! bashio::fs.file_exists "${APPS_DIR}/apps.yaml"; then
 fi
 
 # Seed a VS Code debug configuration on first run
+mkdir -p "${CONFIG_DIR}/.vscode"
 if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/launch.json"; then
     bashio::log.info "Seeding VS Code launch.json..."
-    mkdir -p "${CONFIG_DIR}/.vscode"
     cp "${DEFAULTS_DIR}/vscode/launch.json" "${CONFIG_DIR}/.vscode/launch.json"
+fi
+if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/tasks.json"; then
+    bashio::log.info "Seeding VS Code tasks.json..."
     cp "${DEFAULTS_DIR}/vscode/tasks.json" "${CONFIG_DIR}/.vscode/tasks.json"
+fi
+if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/restart-addon.sh"; then
+    bashio::log.info "Seeding VS Code restart helper script..."
     cp "${DEFAULTS_DIR}/vscode/restart-addon.sh" "${CONFIG_DIR}/.vscode/restart-addon.sh"
     chmod +x "${CONFIG_DIR}/.vscode/restart-addon.sh"
+fi
+
+# Ensure AppDaemon writes logs to /config/logs/appdaemon.log.
+if ! grep -q '^[[:space:]]*log_dir:[[:space:]]*/config/logs' "${CONFIG_DIR}/appdaemon.yaml"; then
+    bashio::log.info "Adding AppDaemon log file settings to appdaemon.yaml..."
+    tmp_file="$(mktemp)"
+    awk '
+        /^[[:space:]]*appdaemon:[[:space:]]*$/ && added == 0 {
+            print
+            print "  log_dir: /config/logs"
+            print "  log_file: appdaemon.log"
+            added = 1
+            next
+        }
+        { print }
+    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
+fi
+
+# Ensure MQTT plugin defaults are available for the HA Mosquitto broker.
+mqtt_broker="$(bashio::config 'mqtt_broker')"
+if [ -n "${mqtt_broker}" ] && ! grep -q '^[[:space:]]*MQTT:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
+    if grep -q '^[[:space:]]*plugins:[[:space:]]*$' "${CONFIG_DIR}/appdaemon.yaml"; then
+        mqtt_port="$(bashio::config 'mqtt_port')"
+        mqtt_user="$(bashio::config 'mqtt_user')"
+        mqtt_password="$(bashio::config 'mqtt_password')"
+
+        bashio::log.info "Adding MQTT plugin defaults to appdaemon.yaml..."
+        tmp_file="$(mktemp)"
+        awk -v broker="${mqtt_broker}" -v port="${mqtt_port}" -v user="${mqtt_user}" -v pass="${mqtt_password}" '
+            {
+                print
+            }
+            /^[[:space:]]*plugins:[[:space:]]*$/ && added == 0 {
+                b = broker
+                u = user
+                pw = pass
+                gsub(/"/, "\\\"", b)
+                gsub(/"/, "\\\"", u)
+                gsub(/"/, "\\\"", pw)
+
+                print "    MQTT:"
+                print "      type: mqtt"
+                print "      namespace: mqtt"
+                print "      client_host: \"" b "\""
+                print "      client_port: " port
+                if (u != "") print "      client_user: \"" u "\""
+                if (pw != "") print "      client_password: \"" pw "\""
+                added = 1
+            }
+        ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
+    else
+        bashio::log.warning "Cannot add MQTT defaults: appdaemon.plugins section not found"
+    fi
 fi
 
 # Migrate old debug adapter type in all workspace launch.json files.

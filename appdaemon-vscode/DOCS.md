@@ -23,6 +23,10 @@ Die Add-on-Optionen (Tab **Configuration**):
 
 ```yaml
 log_level: info
+mqtt_broker: mosquitto
+mqtt_port: 1883
+mqtt_user: ""
+mqtt_password: ""
 system_packages: []
 python_packages: []
 init_commands: []
@@ -40,6 +44,22 @@ Liste zusaetzlicher Alpine-Pakete (apk), die beim Start installiert werden.
 ```yaml
 system_packages:
   - gcc
+```
+
+### Optionen: `mqtt_broker`, `mqtt_port`, `mqtt_user`, `mqtt_password`
+
+Standardmaessig wird der MQTT-Plugin-Block fuer AppDaemon mit dem Broker
+`mosquitto` und Port `1883` eingerichtet. Damit kann AppDaemon direkt mit dem
+Home-Assistant-MQTT-Broker arbeiten.
+
+Wenn dein Broker Authentifizierung verlangt, setze `mqtt_user` und
+`mqtt_password` in den Add-on-Optionen.
+
+```yaml
+mqtt_broker: mosquitto
+mqtt_port: 1883
+mqtt_user: "homeassistant"
+mqtt_password: "<dein-passwort>"
 ```
 
 ### Option: `python_packages`
@@ -66,7 +86,7 @@ init_commands:
 Alle Dateien liegen im Add-on-Konfigurationsordner, erreichbar unter
 `/config` (im Add-on) bzw. `/addon_configs/<slug>_appdaemon-vscode/` auf dem Host:
 
-```
+```text
 /config
 ├── appdaemon.yaml          # Hauptkonfiguration (wird beim ersten Start erzeugt)
 ├── apps/
@@ -86,6 +106,11 @@ Die Standard-`appdaemon.yaml` nutzt den internen Supervisor-Proxy:
 
 ```yaml
 plugins:
+  MQTT:
+    type: mqtt
+    namespace: mqtt
+    client_host: mosquitto
+    client_port: 1883
   HASS:
     type: hass
     ha_url: http://supervisor/core
@@ -99,8 +124,17 @@ Es ist **kein** manueller Long-Lived Access Token noetig. Passe bei Bedarf
 
 Der Editor ist ueber den Sidebar-Eintrag des Add-ons erreichbar (Home Assistant
 Ingress, keine separate Anmeldung noetig). Er oeffnet direkt den Ordner
-`/config`. Die Extensions **Python** und **Debugpy** werden beim ersten Start
-automatisch installiert (Internetzugang erforderlich).
+`/config`.
+
+### AppDaemon-Logs in VS Code anzeigen
+
+Die AppDaemon-Logs werden nach `/config/logs/appdaemon.log` geschrieben.
+In VS Code kannst du sie live sehen:
+
+1. `Ctrl+Shift+P` → `Tasks: Run Task`
+2. `Watch AppDaemon Logs` auswaehlen
+
+Die Task zeigt die letzten 200 Zeilen und folgt neuen Eintraegen live.
 
 ## Remote Debugging
 
@@ -117,10 +151,10 @@ IP des Home-Assistant-Hosts eingetragen werden.
 
 ## Ports
 
-| Port        | Zweck                                   |
-| ----------- | --------------------------------------- |
-| `5050/tcp`  | AppDaemon Web UI / HADashboard          |
-| `5678/tcp`  | debugpy Remote Debugging (VS Code attach) |
+| Port | Zweck |
+| --- | --- |
+| `5050/tcp` | AppDaemon Web UI / HADashboard |
+| `5678/tcp` | debugpy Remote Debugging (VS Code attach) |
 
 ## Support
 

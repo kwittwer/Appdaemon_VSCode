@@ -1,6 +1,6 @@
 ---
 name: AppDaemon + VS Code
-version: "1.0.18"
+version: "1.0.19"
 slug: appdaemon-vscode
 description: >-
   AppDaemon 4.x mit integriertem VS Code (code-server) und debugpy
@@ -30,11 +30,19 @@ map:
   - ssl
 options:
   log_level: info
+  mqtt_broker: mosquitto
+  mqtt_port: 1883
+  mqtt_user: ""
+  mqtt_password: ""
   system_packages: []
   python_packages: []
   init_commands: []
 schema:
   log_level: list(trace|debug|info|notice|warning|error|fatal)?
+  mqtt_broker: str?
+  mqtt_port: int?
+  mqtt_user: str?
+  mqtt_password: password?
   system_packages:
     - str
   python_packages:
