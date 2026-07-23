@@ -12,9 +12,8 @@ readonly CONFIG_DIR="/config"
 readonly APPS_DIR="${CONFIG_DIR}/apps"
 readonly DEFAULTS_DIR="/usr/share/appdaemon-defaults"
 
-if [ -d "/logs" ] || [ ! -d "${CONFIG_DIR}" ]; then
-    LOG_DIR="/logs"
-else
+LOG_DIR="/logs"
+if ! mkdir -p "${LOG_DIR}" 2>/dev/null; then
     LOG_DIR="${CONFIG_DIR}/logs"
 fi
 readonly LOG_DIR
