@@ -19,10 +19,7 @@ RUN \
         py3-pip \
         py3-wheel \
         nodejs \
-        nodejs-dev \
         npm \
-        python3-dev \
-        build-base \
         libstdc++ \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt
 
@@ -40,8 +37,7 @@ RUN \
         | tar -xz -C /opt/code-server --strip-components=1 \
     && rm -f /opt/code-server/lib/node \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
-    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
-    && cd /opt/code-server/lib/vscode && npm rebuild 2>&1 || echo "npm rebuild completed with warnings"
+    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server
 
 # Cleanup
 RUN \
