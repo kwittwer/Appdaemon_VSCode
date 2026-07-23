@@ -19,6 +19,10 @@ RUN \
         py3-pip \
         py3-wheel \
         nodejs \
+        nodejs-dev \
+        npm \
+        python3-dev \
+        build-base \
         libstdc++ \
     \
     && pip install --no-cache-dir --break-system-packages -r /tmp/requirements.txt \
@@ -36,6 +40,8 @@ RUN \
     && rm -f /opt/code-server/lib/node \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
     && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
+    \
+    && npm rebuild node-pty --prefix /opt/code-server/lib/vscode \
     \
     && find /usr \
         \( -type d -a -name test -o -name tests -o -name '__pycache__' \) \
