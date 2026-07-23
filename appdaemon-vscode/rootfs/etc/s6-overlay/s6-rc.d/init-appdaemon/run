@@ -18,6 +18,7 @@ readonly DEFAULTS_DIR="/usr/share/appdaemon-defaults"
 mkdir -p "${APPS_DIR}"
 mkdir -p "${CONFIG_DIR}/dashboards"
 mkdir -p "${CONFIG_DIR}/logs"
+chmod 755 "${CONFIG_DIR}/logs"
 
 # Seed the main configuration on first run
 if ! bashio::fs.file_exists "${CONFIG_DIR}/appdaemon.yaml"; then
