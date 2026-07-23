@@ -1,9 +1,9 @@
 #!/bin/bash
 # Display AppDaemon logs with tail -f
 # Usage: bash .vscode/view-logs.sh
-# Or from code-server terminal: tail -f /logs/appdaemon.log
+# Or from code-server terminal: tail -f /config/logs/appdaemon.log
 
-LOG_FILE="/logs/appdaemon.log"
+LOG_FILE="/config/logs/appdaemon.log"
 
 if [ ! -f "${LOG_FILE}" ]; then
     echo "📋 Log file not found yet: ${LOG_FILE}"

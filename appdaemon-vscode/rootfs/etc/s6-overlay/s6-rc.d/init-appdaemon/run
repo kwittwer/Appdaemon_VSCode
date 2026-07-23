@@ -87,31 +87,17 @@ if grep -q '^logging:' "${CONFIG_DIR}/appdaemon.yaml"; then
     ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
 fi
 
-# Migrate: add logs: block if not present (AppDaemon 4.x file logging)
-if ! grep -q '^logs:' "${CONFIG_DIR}/appdaemon.yaml"; then
-    bashio::log.info "Adding logs: block to appdaemon.yaml for file output at ${LOG_DIR}..."
-    # Insert logs: block before the http: section
-    sed -i "/^http:/i\\
-logs:\\
-  main_log:\\
-    filename: ${LOG_DIR}/appdaemon.log\\
-  error_log:\\
-    filename: ${LOG_DIR}/appdaemon.log\\
-  access_log:\\
-    filename: ${LOG_DIR}/access.log\\
-  diag_log:\\
-    filename: ${LOG_DIR}/diag.log\\
-" "${CONFIG_DIR}/appdaemon.yaml"
-fi
-
-# Migrate: update log path in existing logs: block if pointing to wrong dir
+# Migrate: remove logs: block so AppDaemon logs to stdout (add-on protocol).
+# The add-on run script mirrors stdout to /config/logs/appdaemon.log via tee,
+# so logs are visible both in the add-on protocol and inside VS Code.
 if grep -q '^logs:' "${CONFIG_DIR}/appdaemon.yaml"; then
-    if ! grep -q "filename: ${LOG_DIR}/" "${CONFIG_DIR}/appdaemon.yaml"; then
-        bashio::log.info "Updating log paths in logs: block to ${LOG_DIR}..."
-        sed -i "s#filename: .*/appdaemon\.log#filename: ${LOG_DIR}/appdaemon.log#g" "${CONFIG_DIR}/appdaemon.yaml"
-        sed -i "s#filename: .*/access\.log#filename: ${LOG_DIR}/access.log#g" "${CONFIG_DIR}/appdaemon.yaml"
-        sed -i "s#filename: .*/diag\.log#filename: ${LOG_DIR}/diag.log#g" "${CONFIG_DIR}/appdaemon.yaml"
-    fi
+    bashio::log.info "Removing logs: block from appdaemon.yaml (logs go to add-on protocol)..."
+    tmp_file="$(mktemp)"
+    awk '
+        /^logs:/ { skip=1; next }
+        skip && /^[a-zA-Z]/ { skip=0 }
+        !skip { print }
+    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
 fi
 
 # Ensure MQTT plugin defaults are only configured when explicitly enabled.

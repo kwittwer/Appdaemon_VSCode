@@ -16,16 +16,6 @@ appdaemon:
       ha_url: http://supervisor/core
       token: !env_var SUPERVISOR_TOKEN
 
-logs:
-  main_log:
-    filename: /logs/appdaemon.log
-  error_log:
-    filename: /logs/appdaemon.log
-  access_log:
-    filename: /logs/access.log
-  diag_log:
-    filename: /logs/diag.log
-
 http:
   url: http://0.0.0.0:5050
 

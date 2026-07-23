@@ -16,4 +16,9 @@ bashio::log.info "Starting AppDaemon..."
 
 cd /config || bashio::exit.nok "Could not change to /config directory"
 
-exec appdaemon -c /config
+# Ensure log directory exists for the tee-mirrored log file (visible in VS Code)
+mkdir -p /config/logs
+
+# Run AppDaemon and mirror its output to both the add-on protocol (stdout)
+# and a log file that can be tailed live inside VS Code (code-server).
+exec appdaemon -c /config 2>&1 | tee -a /config/logs/appdaemon.log
