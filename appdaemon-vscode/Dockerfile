@@ -37,7 +37,15 @@ RUN \
         | tar -xz -C /opt/code-server --strip-components=1 \
     && rm -f /opt/code-server/lib/node \
     && ln -s /usr/bin/node /opt/code-server/lib/node \
-    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server
+    && ln -sf /opt/code-server/bin/code-server /usr/bin/code-server \
+    \
+    && apk upgrade --no-cache musl musl-utils \
+    && apk add --no-cache --virtual .build-deps build-base python3-dev \
+    && ( cd /opt/code-server/lib/vscode \
+         && npm rebuild node-pty --build-from-source 2>&1 || echo "node-pty rebuild warnings" ) \
+    && find /opt/code-server -type d -name node-pty -exec \
+        sh -c 'cd "$1" && npm run install --build-from-source 2>/dev/null || true' _ {} \; \
+    && apk del --no-network .build-deps
 
 # Cleanup
 RUN \
