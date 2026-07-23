@@ -49,6 +49,9 @@ fi
 if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/tasks.json"; then
     bashio::log.info "Seeding VS Code tasks.json..."
     cp "${DEFAULTS_DIR}/vscode/tasks.json" "${CONFIG_DIR}/.vscode/tasks.json"
+else
+    # Always refresh tasks.json so add-on-managed tasks (live log watcher) stay current
+    cp "${DEFAULTS_DIR}/vscode/tasks.json" "${CONFIG_DIR}/.vscode/tasks.json"
 fi
 if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/restart-addon.sh"; then
     bashio::log.info "Seeding VS Code restart helper script..."
@@ -163,6 +166,26 @@ while IFS= read -r launch_file; do
         sed -i 's/"type"[[:space:]]*:[[:space:]]*"debugpy"/"type": "python"/g' "${launch_file}"
     fi
 done < <(find "${CONFIG_DIR}" -type f -path '*/.vscode/launch.json' 2>/dev/null)
+
+# Ensure automatic tasks are allowed so the live log watcher starts on folder open.
+USER_SETTINGS="${CONFIG_DIR}/.vscode-data/User/settings.json"
+if bashio::fs.file_exists "${USER_SETTINGS}"; then
+    if ! grep -q '"task.allowAutomaticTasks"' "${USER_SETTINGS}"; then
+        bashio::log.info "Enabling task.allowAutomaticTasks in VS Code user settings..."
+        python3 - "${USER_SETTINGS}" <<'PY' || bashio::log.warning "Could not update user settings.json"
+import json, sys
+path = sys.argv[1]
+try:
+    with open(path) as f:
+        data = json.load(f)
+except Exception:
+    data = {}
+data["task.allowAutomaticTasks"] = "on"
+with open(path, "w") as f:
+    json.dump(data, f, indent=4)
+PY
+    fi
+fi
 
 # ------------------------------------------------------------------------------
 # Optional: install extra system packages

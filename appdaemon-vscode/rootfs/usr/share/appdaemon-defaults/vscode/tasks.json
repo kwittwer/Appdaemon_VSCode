@@ -2,6 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Watch AppDaemon Logs",
+            "type": "shell",
+            "command": "touch /config/logs/appdaemon.log && tail -n 200 -f /config/logs/appdaemon.log",
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "group": "appdaemon",
+                "showReuseMessage": false,
+                "clear": false,
+                "focus": false
+            },
+            "runOptions": {
+                "runOn": "folderOpen"
+            },
+            "problemMatcher": [],
+            "isBackground": true
+        },
+        {
             "label": "Restart AppDaemon Add-on",
             "type": "shell",
             "command": "/config/.vscode/restart-addon.sh",
