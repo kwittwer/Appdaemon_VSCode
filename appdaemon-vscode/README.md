@@ -11,8 +11,9 @@ Standardmaessig ist MQTT deaktiviert, damit das Add-on ohne Broker stabil
 startet. Fuer MQTT setze `mqtt_broker` (z. B. `mosquitto`) und optional
 `mqtt_user`/`mqtt_password` in den Add-on-Optionen.
 
-AppDaemon schreibt seine Logs nach `/config/logs/appdaemon.log`.
-Im VS Code Integrated Terminal kannst du sie mit `tail -f /config/logs/appdaemon.log` live sehen.
+AppDaemon schreibt seine Logs bevorzugt nach `/logs/appdaemon.log`
+(Fallback: `/config/logs/appdaemon.log`).
+Im VS Code Integrated Terminal kannst du sie mit `tail -f /logs/appdaemon.log` live sehen.
 
 Die Verbindung zu Home Assistant erfolgt automatisch ueber den Supervisor –
 ein Long-Lived Access Token ist nicht erforderlich.

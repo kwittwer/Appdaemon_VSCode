@@ -12,13 +12,20 @@ readonly CONFIG_DIR="/config"
 readonly APPS_DIR="${CONFIG_DIR}/apps"
 readonly DEFAULTS_DIR="/usr/share/appdaemon-defaults"
 
+if [ -d "/logs" ] || [ ! -d "${CONFIG_DIR}" ]; then
+    LOG_DIR="/logs"
+else
+    LOG_DIR="${CONFIG_DIR}/logs"
+fi
+readonly LOG_DIR
+
 # ------------------------------------------------------------------------------
 # Ensure the AppDaemon configuration structure exists
 # ------------------------------------------------------------------------------
 mkdir -p "${APPS_DIR}"
 mkdir -p "${CONFIG_DIR}/dashboards"
-mkdir -p "${CONFIG_DIR}/logs"
-chmod 755 "${CONFIG_DIR}/logs"
+mkdir -p "${LOG_DIR}"
+chmod 755 "${LOG_DIR}" || true
 
 # Seed the main configuration on first run
 if ! bashio::fs.file_exists "${CONFIG_DIR}/appdaemon.yaml"; then
@@ -55,14 +62,31 @@ if ! bashio::fs.file_exists "${CONFIG_DIR}/.vscode/view-logs.sh"; then
     chmod +x "${CONFIG_DIR}/.vscode/view-logs.sh"
 fi
 
-# Ensure AppDaemon writes logs to /config/logs/appdaemon.log.
-if ! grep -q '^[[:space:]]*log_dir:[[:space:]]*/config/logs' "${CONFIG_DIR}/appdaemon.yaml"; then
-    bashio::log.info "Adding AppDaemon log file settings to appdaemon.yaml..."
+# Ensure AppDaemon writes logs to the active log directory.
+if grep -q '^[[:space:]]*log_dir:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml"; then
+    sed -i "s#^[[:space:]]*log_dir:[[:space:]]*.*#  log_dir: ${LOG_DIR}#" "${CONFIG_DIR}/appdaemon.yaml"
+else
+    bashio::log.info "Adding AppDaemon log_dir setting to appdaemon.yaml..."
     tmp_file="$(mktemp)"
-    awk '
+    awk -v logdir="${LOG_DIR}" '
         /^[[:space:]]*appdaemon:[[:space:]]*$/ && added == 0 {
             print
-            print "  log_dir: /config/logs"
+            print "  log_dir: " logdir
+            added = 1
+            next
+        }
+        { print }
+    ' "${CONFIG_DIR}/appdaemon.yaml" > "${tmp_file}" && mv "${tmp_file}" "${CONFIG_DIR}/appdaemon.yaml"
+fi
+
+if grep -q '^[[:space:]]*log_file:[[:space:]]*' "${CONFIG_DIR}/appdaemon.yaml"; then
+    sed -i 's#^[[:space:]]*log_file:[[:space:]]*.*#  log_file: appdaemon.log#' "${CONFIG_DIR}/appdaemon.yaml"
+else
+    bashio::log.info "Adding AppDaemon log_file setting to appdaemon.yaml..."
+    tmp_file="$(mktemp)"
+    awk '
+        /^[[:space:]]*log_dir:[[:space:]]*/ && added == 0 {
+            print
             print "  log_file: appdaemon.log"
             added = 1
             next
