@@ -10,6 +10,18 @@ Dieses Add-on vereint drei Werkzeuge in einem Container:
 | code-server  | VS Code im Browser                               | Sidebar (Ingress)        |
 | debugpy      | Remote-Debugging der AppDaemon-Apps aus VS Code  | Port `5678` (attach)     |
 
+## Oberflaechen oeffnen
+
+- **VS Code (code-server):** Ueber das Sidebar-Panel **AppDaemon Code** oder
+  den Button **Web UI oeffnen** auf der Add-on-Info-Seite (Ingress).
+- **AppDaemon UI / Dashboard:** Unter `http://<HA-IP>:5050` erreichbar
+  (z. B. `http://homeassistant.local:5050`). Der Port `5050` ist in den
+  Add-on-Optionen exponiert und kann direkt im Browser geoeffnet werden.
+
+> Hinweis: Home Assistant erlaubt bei aktiviertem Ingress nur **einen**
+> "Web UI oeffnen"-Button. Dieser oeffnet VS Code. Die AppDaemon-UI oeffnest
+> du ueber die oben genannte URL `:5050`.
+
 ## Installation
 
 1. Repository in Home Assistant hinzufuegen
